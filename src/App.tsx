@@ -1,13 +1,12 @@
 import Header from "./components/Header";
-// import LandingPage from "./pages/LandingPage";
-import ShoppingList from "./pages/ShoppingList";
-// import ShoppingCart from "./pages/ShoppingCart";
+import { Outlet } from "react-router-dom";
+import "./index.css";
 
 function App() {
   return (
     <div className="flex flex-col h-screen bg-neutral-800">
       <Header />
-      <ShoppingList/>
+      <Outlet />
     </div>
   );
 }
