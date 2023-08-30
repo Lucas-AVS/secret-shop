@@ -26,18 +26,27 @@ export default function CartItem({
       <p className="flex justify-center items-center border-solid border border-neutral-800 rounded text-neutral-800 w-12 h-12">
         {ItemStock}
       </p>
-      <p className="flex">
-        <button className="bg-neutral-800 border-solid border border-neutral-800 rounded text-neutral-100 w-12 h-12">
+      <div className="flex">
+        <button
+          className="bg-neutral-800 border-solid border border-neutral-800 rounded text-neutral-100 w-12 h-12
+        hover:font-bold hover:text-white hover:bg-neutral-700"
+        >
           +
         </button>
         <p className="flex justify-center items-center border-solid border border-neutral-800 rounded text-neutral-800 w-12 h-12">
           {ItemOnCart}
         </p>
-        <button className="bg-neutral-300 border-solid border border-neutral-800 rounded text-neutral-800 w-12 h-12">
+        <button
+          className="bg-neutral-300 border-solid border border-neutral-800 rounded text-neutral-800 w-12 h-12
+        hover:font-bold hover:text-black hover:bg-neutral-400"
+        >
           -
         </button>
-      </p>
-      <button className="border-solid border border-neutral-800 rounded text-neutral-800 w-12 h-12">
+      </div>
+      <button
+        className="border-solid border border-neutral-800 rounded text-neutral-800 w-12 h-12
+      hover:font-bold hover:text-black hover:bg-red-600"
+      >
         x
       </button>
       <p>{ItemPrice} gold</p>
