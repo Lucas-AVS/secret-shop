@@ -3,13 +3,18 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AuthContextProvider } from "./context/AuthContext";
+import ProtectedRoutes from "./services/ProtectedRoutes.tsx";
+import PublicRoutes from "./services/PublicRoutes";
+
 import LandingPage from "./pages/LandingPage";
 import ShoppingList from "./pages/ShoppingList";
 import ShoppingCart from "./pages/ShoppingCart";
 import ErrorPage from "./pages/ErrorPage.tsx";
-
-
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import LogIn from "./pages/LogIn.tsx";
+import SignUp from "./pages/SignUp.tsx";
+import Backpack from "./pages/Backpack.tsx";
 
 const router = createBrowserRouter([
   {
@@ -22,12 +27,36 @@ const router = createBrowserRouter([
         element: <LandingPage />,
       },
       {
-        path: "/shop",
-        element: <ShoppingList />,
+        path: "/",
+        element: <PublicRoutes />,
+        children: [
+          {
+            path: "/login",
+            element: <LogIn />,
+          },
+          {
+            path: "/signup",
+            element: <SignUp />,
+          },
+        ],
       },
       {
-        path: "/cart",
-        element: <ShoppingCart />,
+        path: "/",
+        element: <ProtectedRoutes />,
+        children: [
+          {
+            path: "/shop",
+            element: <ShoppingList />,
+          },
+          {
+            path: "/cart",
+            element: <ShoppingCart />,
+          },
+          {
+            path: "/bag",
+            element: <Backpack />,
+          },
+        ],
       },
     ],
   },
@@ -35,6 +64,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+    </AuthContextProvider>
   </React.StrictMode>
 );
