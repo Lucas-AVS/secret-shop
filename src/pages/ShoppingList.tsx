@@ -1,11 +1,36 @@
 import DotaLogo from "../assets/dota-logo.png";
 import ShoppingItem from "../components/ShoppingItem";
 import Tango from "../assets/tango-icon.png";
-import HealingSalve from "../assets/healing-salve-icon.png";
-import Clarity from "../assets/clarity-icon.png";
-import Bottle from "../assets/bottle-icon.png";
+// import HealingSalve from "../assets/healing-salve-icon.png";
+// import Clarity from "../assets/clarity-icon.png";
+// import Bottle from "../assets/bottle-icon.png";
+import { useEffect, useState } from "react";
+import { supabase } from "../services/supabaseClient";
 
 export default function ShoppingList() {
+  type Item = {
+    created_at: string;
+    id: number;
+    name: string;
+    price: number;
+    stock: number;
+  };
+
+  const [items, setItems] = useState<Item[]>([]);
+  const fetchItems = async () => {
+    const { data, error } = await supabase.from("items").select("*");
+
+    if (error) {
+      console.log(error);
+    } else {
+      setItems(data);
+    }
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
   return (
     <>
       <div className="grid grid-cols-3 items-center w-3/4 h-1/5 mx-auto">
@@ -22,13 +47,13 @@ export default function ShoppingList() {
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            stroke-width="1.5"
+            strokeWidth="1.5"
             stroke="currentColor"
             className="w-6 h-6 text-neutral-400 scale-[1] lg:scale-[1.3]"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
             />
           </svg>
@@ -44,13 +69,16 @@ export default function ShoppingList() {
         <div>
           <h2 className="flex justify-around pt-6">Consumables</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-3/4 pt-6 mx-auto">
-            <ShoppingItem
-              ItemName="Tango"
-              ItemImage={Tango}
-              Stock={10}
-              Price={90}
-            />
-            <ShoppingItem
+            {items.map((item) => (
+              <ShoppingItem
+                key={item.id}
+                ItemName={item.name}
+                ItemImage={Tango}
+                Stock={item.stock}
+                Price={item.price}
+              />
+            ))}
+            {/* <ShoppingItem
               ItemName="Healing Salve"
               ItemImage={HealingSalve}
               Stock={10}
@@ -67,7 +95,7 @@ export default function ShoppingList() {
               ItemImage={Bottle}
               Stock={10}
               Price={675}
-            />
+            /> */}
           </div>
         </div>
       </div>
