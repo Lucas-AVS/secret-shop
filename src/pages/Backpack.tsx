@@ -16,23 +16,34 @@ export default function Backpack() {
 
   function getEmailUsername(email?: string) {
     if (!email) {
-      return "Unknown"
-    } 
+      return "Unknown";
+    }
     return email.split("@")[0];
   }
 
-  const [items, setItems] = useState([]);
-  
+  type Item = {
+    created_at: string;
+    id: number;
+    name: string;
+    slot: number;
+    quantity: number;
+    price: number;
+  };
+
+  type Items = Item[];
+
+  const [items, setItems] = useState<Items>([]);
+
   const fetchItems = async () => {
     const { data, error } = await supabase.from("backpack").select(`
-      id, 
-      items!item1_id(name),
-    `);
+      id,
+      item_quantity,
+      item_slot,
+      items( id, name, price, image_url )`);
     if (error) {
       console.log(error);
     } else {
-      // setItems(data);
-      console.log(data)
+      setItems(data);
     }
   };
 
@@ -69,111 +80,62 @@ export default function Backpack() {
           <div className="flex flex-col justify-center items-center mx-auto">
             <h2 className="flex justify-around pt-6 text-xl">Equipped</h2>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 pt-6 mx-auto">
-              {/* {items.map((item: any) => (
-        <BackpackItem
-          key={item.id}
-          ItemName={item.items.name}
-          ItemImage={Tango}
-          Stock={item.items.stock}
-          Price={item.items.price}
-        />
-      ))} */}
-              <BackpackItem
-                key={1}
-                ItemName={"Tango"}
-                ItemImage={Tango}
-                Quantity={10}
-                Price={90}
-              />
-              <BackpackItem
-                key={2}
-                ItemName={"Tango"}
-                ItemImage={HealingSalve}
-                Quantity={10}
-                Price={90}
-              />
-              <BackpackItem
-                key={3}
-                ItemName={"Tango"}
-                ItemImage={Tango}
-                Quantity={10}
-                Price={90}
-              />
-              <BackpackItem
-                key={4}
-                ItemName={"Tango"}
-                ItemImage={HealingSalve}
-                Quantity={10}
-                Price={90}
-              />
-              <BackpackItem
-                key={5}
-                ItemName={"Tango"}
-                ItemImage={Tango}
-                Quantity={10}
-                Price={90}
-              />
-              <BackpackItem
-                key={6}
-                ItemName={null}
-                ItemImage={null}
-                Quantity={null}
-                Price={null}
-              />
+              {Array.from({ length: 6 }, (_, i) => {
+                const item = items.find((item) => item.item_slot === i);
+                return (
+                  <div key={i}>
+                    {item ? (
+                      <BackpackItem
+                        ItemName={item.items.name}
+                        ItemImage={item.items.image_url}
+                        Quantity={item.item_quantity}
+                        Price={item.items.price}
+                      />
+                    ) : (
+                      <BackpackItem
+                        ItemName={null}
+                        ItemImage={null}
+                        Quantity={null}
+                        Price={null}
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
         <div className="flex flex-col justify-center items-center py-12">
           <h2 className="flex justify-around pt-6 text-xl">Stash</h2>
           <div className="flex grid grid-cols-3 lg:grid-cols-6 gap-3 pt-6 mx-auto">
-            <BackpackItem
-              key={1}
-              ItemName={null}
-              ItemImage={null}
-              Quantity={null}
-              Price={null}
-            />
-             <BackpackItem
-                key={2}
-                ItemName={null}
-                ItemImage={null}
-                Quantity={null}
-                Price={null}
-              />
-               <BackpackItem
-                key={3}
-                ItemName={null}
-                ItemImage={null}
-                Quantity={null}
-                Price={4}
-              />
-               <BackpackItem
-                key={5}
-                ItemName={null}
-                ItemImage={null}
-                Quantity={null}
-                Price={null}
-              />
-               <BackpackItem
-                key={6}
-                ItemName={null}
-                ItemImage={null}
-                Quantity={null}
-                Price={null}
-              />
-               <BackpackItem
-                key={7}
-                ItemName={null}
-                ItemImage={null}
-                Quantity={null}
-                Price={null}
-              />
+            {Array.from({ length: 6 }, (_, i) => {
+              const item = items.find((item) => item.item_slot === i + 6);
+              return (
+                <div key={i}>
+                  {item ? (
+                    <BackpackItem
+                      ItemName={item.items.name}
+                      ItemImage={Tango}
+                      Quantity={item.item_quantity}
+                      Price={item.items.price}
+                    />
+                  ) : (
+                    <BackpackItem
+                      ItemName={null}
+                      ItemImage={null}
+                      Quantity={null}
+                      Price={null}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
           <button
-              className={`mt-10 w-1/3 py-2 px-4 rounded bg-red-800 text-white hover:bg-red-600`}
-            >
-              <span className="text-xl">Save!</span>
-            </button>
+            className={`mt-10 w-1/3 py-2 px-4 rounded bg-red-800 text-white hover:bg-red-600`}
+          >
+            <span className="text-xl">Save!</span>
+          </button>
         </div>
       </div>
     </div>
