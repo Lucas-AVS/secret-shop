@@ -14,7 +14,7 @@ function App() {
   }
 
   return (
-      <div className="flex flex-col h-screen bg-neutral-800">
+      <div className="flex flex-col min-h-screen bg-neutral-800 pb-8">
         <Header />
         <Outlet />
       </div>
