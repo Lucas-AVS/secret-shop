@@ -1,9 +1,5 @@
 import DotaLogo from "../assets/dota-logo.png";
 import ShoppingItem from "../components/ShoppingItem";
-import Tango from "../assets/tango-icon.png";
-// import HealingSalve from "../assets/healing-salve-icon.png";
-// import Clarity from "../assets/clarity-icon.png";
-// import Bottle from "../assets/bottle-icon.png";
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabaseClient";
 
@@ -14,6 +10,7 @@ export default function ShoppingList() {
     name: string;
     price: number;
     stock: number;
+    image_url: string;
   };
 
   const [items, setItems] = useState<Item[]>([]);
@@ -33,16 +30,16 @@ export default function ShoppingList() {
 
   return (
     <>
-      <div className="grid grid-cols-3 items-center w-3/4 h-1/5 mx-auto">
+      <div className="grid grid-cols-3 items-center w-3/4 mx-auto">
         <div>
           <h1 className="text-neutral-400 lg:text-2xl col-span-3 text-center">
             GET YOUR <br /> GEAR HERE!
           </h1>
         </div>
         <div className="flex justify-center items-center">
-          <img className="w-[15%] lg:w-[9%] absolute" src={DotaLogo} alt="" />
+          <img className="h-20 lg:h-32 absolute" src={DotaLogo} alt="" />
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end  ">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -59,7 +56,7 @@ export default function ShoppingList() {
           </svg>
         </div>
       </div>
-      <div className="w-3/4 h-fit bg-neutral-200 px-2 py-6 -mt-12 mx-auto rounded-lg">
+      <div className="w-3/4 h-fit bg-neutral-200 px-2 py-6 mx-auto rounded-lg">
         <header className="sm:grid-cols-4 grid grid-cols-2 items-center pb-6 border-b-2 border-neutral-400">
           <button className="hover:font-bold">Consumables</button>
           <button className="hover:font-bold">Support</button>
@@ -73,29 +70,11 @@ export default function ShoppingList() {
               <ShoppingItem
                 key={item.id}
                 ItemName={item.name}
-                ItemImage={Tango}
+                ItemImage={item.image_url}
                 Stock={item.stock}
                 Price={item.price}
               />
             ))}
-            {/* <ShoppingItem
-              ItemName="Healing Salve"
-              ItemImage={HealingSalve}
-              Stock={10}
-              Price={100}
-            />
-            <ShoppingItem
-              ItemName="Clarity"
-              ItemImage={Clarity}
-              Stock={10}
-              Price={50}
-            />
-            <ShoppingItem
-              ItemName="Bottle"
-              ItemImage={Bottle}
-              Stock={10}
-              Price={675}
-            /> */}
           </div>
         </div>
       </div>
