@@ -8,7 +8,7 @@ interface ShoppingItemProps {
   Price: number | null;
 }
 
-export default function ShoppingItem({
+export default function BackpackItem({
   ItemName,
   ItemImage,
   Quantity,
@@ -25,7 +25,7 @@ export default function ShoppingItem({
       >
         <img
           className="p-1 absolute inset-0 w-full h-full object-cover"
-          src={ItemImage? ItemImage : null}
+          src={ItemImage ? ItemImage : null}
           // foi alterado de: src?: string | undefined; para src?: string | null;
           alt=""
         />
