@@ -25,17 +25,25 @@ export default function CartItem({
     return JSON.parse(localStorage.getItem("cartItems") || "[]");
   };
 
-  const itemIndex = cartItems().findIndex((item) => item.ItemName === ItemName);
+  interface Item {
+    quantity: number
+  }
+
+  const itemIndex = cartItems().findIndex(
+    (item: CartItemType) => item.ItemName === ItemName
+  );
 
   const increaseQuantity = () => {
     if (quantity < ItemStock) {
       setQuantity(quantity + 1);
-      const updatedQuantity = cartItems().map((item, i) => {
-        if (i == itemIndex) {
-          item.quantity++;
+      const updatedQuantity = cartItems().map(
+        (item: Item, i: number) => {
+          if (i == itemIndex) {
+            item.quantity++;
+          }
+          return item;
         }
-        return item;
-      });
+      );
       localStorage.setItem("cartItems", JSON.stringify(updatedQuantity));
       setReload(!reload);
     }
@@ -44,7 +52,7 @@ export default function CartItem({
   const decreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
-      const updatedQuantity = cartItems().map((item, i) => {
+      const updatedQuantity = cartItems().map((item: Item, i: number) => {
         if (i == itemIndex) {
           item.quantity--;
         }
@@ -58,7 +66,7 @@ export default function CartItem({
   const removeItem = () => {
     if (itemIndex !== -1) {
       const updatedCartItems = cartItems().filter(
-        (item) => item.ItemName !== ItemName
+        (item: CartItemType) => item.ItemName !== ItemName
       );
       localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
       // setQuantity(0);

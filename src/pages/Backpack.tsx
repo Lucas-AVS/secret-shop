@@ -1,14 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { supabase } from "../services/supabaseClient";
 
-import Tango from "../assets/tango-icon.png";
-import HealingSalve from "../assets/healing-salve-icon.png";
 import Armory from "../assets/armory.png";
 import GoldIcon from "../assets/gold-icon.png";
 import ProfileIcon from "../assets/profile-icon-place-holder.png";
 
 import BackpackItem from "../components/BackpackItem";
-import StashItem from "../components/StashItem";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Backpack() {
@@ -21,13 +18,18 @@ export default function Backpack() {
     return email.split("@")[0];
   }
 
+  // Item is the interface for the backpack table, with items being the values coming from foreign keys.
   type Item = {
     created_at: string;
-    id: number;
-    name: string;
-    slot: number;
-    quantity: number;
-    price: number;
+    item_slot: number;
+    item_quantity: number;
+    items: {
+      id: number;
+      name: string;
+      quantity: number;
+      price: number;
+      image_url: string;
+    };
   };
 
   type Items = Item[];
@@ -35,11 +37,11 @@ export default function Backpack() {
   const [items, setItems] = useState<Items>([]);
 
   const fetchItems = async () => {
-    const { data, error } = await supabase.from("backpack").select(`
+    const { data, error } = (await supabase.from("backpack").select(`
       id,
       item_quantity,
       item_slot,
-      items( id, name, price, image_url )`);
+      items( id, name, price, image_url )`)) as { data: Item[]; error: any };
     if (error) {
       console.log(error);
     } else {
@@ -115,7 +117,7 @@ export default function Backpack() {
                   {item ? (
                     <BackpackItem
                       ItemName={item.items.name}
-                      ItemImage={Tango}
+                      ItemImage={item.items.image_url}
                       Quantity={item.item_quantity}
                       Price={item.items.price}
                     />

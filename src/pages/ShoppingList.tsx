@@ -15,7 +15,7 @@ export default function ShoppingList() {
 
   const [items, setItems] = useState<Item[]>([]);
   const fetchItems = async () => {
-    const { data, error } = await supabase.from("items").select("*");
+    const { data, error } = await supabase.from("items").select("*") as { data: Item[]; error: any };
 
     if (error) {
       console.log(error);

@@ -20,7 +20,7 @@ export default function ShoppingItem({
     );
 
     const itemIndex = existingCartItems.findIndex(
-      (item) => item.ItemName === cartItem.ItemName
+      (item: ShoppingItemProps) => item.ItemName === cartItem.ItemName
     );
 
     if (itemIndex !== -1) {

@@ -2,16 +2,20 @@ import CartItem from "../components/CartItem";
 import Techies from "../assets/techies-shopping-cart.png";
 import { useState, useEffect } from "react";
 import { supabase } from "../services/supabaseClient";
-// import Tango from "../assets/tango-icon.png";
-// import HealingSalve from "../assets/healing-salve-icon.png";
-// import Clarity from "../assets/clarity-icon.png";
-// import Bottle from "../assets/bottle-icon.png";
 
 export default function ShoppingCart() {
-  const [reload, setReload] = useState(0);
 
+  interface CartItem {
+    ItemImage: string;
+    ItemName: string;
+    quantity: number;
+    Stock: number;
+    Price: number;
+  }
+
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [reload, setReload] = useState<boolean>(false);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     const localCartItems = JSON.parse(
