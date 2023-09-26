@@ -35,6 +35,7 @@ export default function Backpack() {
   type Items = Item[];
 
   const [items, setItems] = useState<Items>([]);
+  const [draggedItem, setDraggedItem] = useState<Item | null>(null);
 
   const fetchItems = async () => {
     const { data, error } = (await supabase.from("backpack").select(`
@@ -52,6 +53,55 @@ export default function Backpack() {
   useEffect(() => {
     fetchItems();
   }, []);
+
+  const getItemsInfo = () => {
+    console.log(items);
+  };
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: Item) => {
+    setDraggedItem(item);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetSlot: number) => {
+    e.preventDefault();
+
+    if (!draggedItem) {
+      return;
+    }
+
+    const targetItem = items.find((item) => item.item_slot === targetSlot);
+
+    if (!targetItem) {
+      const updatedItem = { ...draggedItem, item_slot: targetSlot };
+
+      setItems((prevItems) => {
+        const updatedItems = prevItems.map((item) => {
+          if (item === draggedItem) {
+            return updatedItem;
+          }
+          return item;
+        });
+        return updatedItems;
+      });
+    } else if (targetItem !== draggedItem) {
+      const updatedItems = items.map((item) => {
+        if (item === targetItem) {
+          return { ...item, item_slot: draggedItem.item_slot };
+        } else if (item === draggedItem) {
+          return { ...item, item_slot: targetSlot };
+        }
+        return item;
+      });
+
+      setItems(updatedItems);
+    }
+
+    setDraggedItem(null);
+  };
 
   return (
     <div>
@@ -85,7 +135,13 @@ export default function Backpack() {
               {Array.from({ length: 6 }, (_, i) => {
                 const item = items.find((item) => item.item_slot === i);
                 return (
-                  <div key={i}>
+                  <div
+                    key={i}
+                    draggable={!!item}
+                    onDragStart={(e) => item && handleDragStart(e, item)}
+                    onDragOver={(e) => handleDragOver(e)}
+                    onDrop={(e) => handleDrop(e, i)}
+                  >
                     {item ? (
                       <BackpackItem
                         ItemName={item.items.name}
@@ -113,7 +169,13 @@ export default function Backpack() {
             {Array.from({ length: 6 }, (_, i) => {
               const item = items.find((item) => item.item_slot === i + 6);
               return (
-                <div key={i}>
+                <div
+                  key={i+6}
+                  draggable={!!item}
+                  onDragStart={(e) => item && handleDragStart(e, item)}
+                  onDragOver={(e) => handleDragOver(e)}
+                  onDrop={(e) => handleDrop(e, i+6)}
+                >
                   {item ? (
                     <BackpackItem
                       ItemName={item.items.name}
@@ -135,6 +197,7 @@ export default function Backpack() {
           </div>
           <button
             className={`mt-10 w-1/3 py-2 px-4 rounded bg-red-800 text-white hover:bg-red-600`}
+            onClick={() => getItemsInfo()}
           >
             <span className="text-xl">Save!</span>
           </button>
