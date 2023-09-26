@@ -5,6 +5,8 @@ interface ShoppingItemProps {
   ItemImage: string;
   Stock: number;
   Price: number;
+  setCount: (reload: number) => void;
+  count: number;
 }
 
 export default function ShoppingItem({
@@ -12,6 +14,8 @@ export default function ShoppingItem({
   ItemImage,
   Stock,
   Price,
+  setCount,
+  count,
 }: ShoppingItemProps) {
   const addToCart = () => {
     const cartItem = { ItemName, ItemImage, Stock, Price, quantity: 1 };
@@ -33,6 +37,7 @@ export default function ShoppingItem({
 
     const updatedStock = Stock - 1;
     localStorage.setItem(ItemName + "_stock", updatedStock.toString());
+    setCount(count + 1);
   };
 
   return (

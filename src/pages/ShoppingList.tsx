@@ -2,6 +2,7 @@ import DotaLogo from "../assets/dota-logo.png";
 import ShoppingItem from "../components/ShoppingItem";
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 export default function ShoppingList() {
   type Item = {
@@ -15,7 +16,10 @@ export default function ShoppingList() {
 
   const [items, setItems] = useState<Item[]>([]);
   const fetchItems = async () => {
-    const { data, error } = await supabase.from("items").select("*") as { data: Item[]; error: any };
+    const { data, error } = (await supabase.from("items").select("*")) as {
+      data: Item[];
+      error: any;
+    };
 
     if (error) {
       console.log(error);
@@ -28,6 +32,10 @@ export default function ShoppingList() {
     fetchItems();
   }, []);
 
+  const [count, setCount] = useState<number>(0);
+
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="grid grid-cols-3 items-center w-3/4 mx-auto">
@@ -39,21 +47,39 @@ export default function ShoppingList() {
         <div className="flex justify-center items-center">
           <img className="h-20 lg:h-32 absolute" src={DotaLogo} alt="" />
         </div>
-        <div className="flex justify-end  ">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6 text-neutral-400 scale-[1] lg:scale-[1.3]"
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="relative w-8 p-1"
+            onClick={() => {
+              navigate("/cart");
+            }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-            />
-          </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-6 h-6 text-neutral-400 scale-[1] lg:scale-[1.3] hover:text-white"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+              />
+            </svg>
+            {!count ? (
+              <div></div>
+            ) : (
+              <>
+                <span className="sr-only">Notifications</span>
+                <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-neutral-200 bg-red-500 border-2 border-neutral-200 rounded-full -top-2 -right-2 dark:border-gray-900">
+                  {count}
+                </div>
+              </>
+            )}
+          </button>
         </div>
       </div>
       <div className="w-3/4 h-fit bg-neutral-200 px-2 py-6 mx-auto rounded-lg">
@@ -73,6 +99,8 @@ export default function ShoppingList() {
                 ItemImage={item.image_url}
                 Stock={item.stock}
                 Price={item.price}
+                setCount={setCount}
+                count={count}
               />
             ))}
           </div>
