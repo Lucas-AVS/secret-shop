@@ -46,7 +46,7 @@ export default function ShoppingCart() {
       { item_id: 4, item_quantity: 1 },
     ];
 
-    const { data, error } = await supabase.functions.invoke("firstNoUsedSlot", {
+    const { data, error } = await supabase.functions.invoke("checkout", {
       body: itemPayload,
     });
     console.log(data);
