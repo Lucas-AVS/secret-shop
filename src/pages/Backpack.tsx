@@ -6,6 +6,7 @@ import GoldIcon from "../assets/gold-icon.png";
 import ProfileIcon from "../assets/profile-icon-place-holder.png";
 
 import BackpackItem from "../components/BackpackItem";
+import EmptyBackPackSlot from "../components/EmptyBackPackSlot";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Backpack() {
@@ -35,6 +36,7 @@ export default function Backpack() {
   type Items = Item[];
 
   const [items, setItems] = useState<Items>([]);
+  const [initialItems, setInitialItems] = useState<Items>([]);
   const [draggedItem, setDraggedItem] = useState<Item | null>(null);
 
   const fetchItems = async () => {
@@ -47,16 +49,13 @@ export default function Backpack() {
       console.log(error);
     } else {
       setItems(data);
+      setInitialItems(data);
     }
   };
 
   useEffect(() => {
     fetchItems();
   }, []);
-
-  const getItemsInfo = () => {
-    console.log(items);
-  };
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: Item) => {
     setDraggedItem(item);
@@ -66,7 +65,14 @@ export default function Backpack() {
     e.preventDefault();
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetSlot: number) => {
+  function canItemsStack(itemName) {
+    return ["Tango", "Mango", "Clarity"].includes(itemName);
+  }
+
+  const handleDrop = (
+    e: React.DragEvent<HTMLDivElement>,
+    targetSlot: number
+  ) => {
     e.preventDefault();
 
     if (!draggedItem) {
@@ -76,8 +82,8 @@ export default function Backpack() {
     const targetItem = items.find((item) => item.item_slot === targetSlot);
 
     if (!targetItem) {
+      // empty slot -> move item
       const updatedItem = { ...draggedItem, item_slot: targetSlot };
-
       setItems((prevItems) => {
         const updatedItems = prevItems.map((item) => {
           if (item === draggedItem) {
@@ -87,7 +93,28 @@ export default function Backpack() {
         });
         return updatedItems;
       });
-    } else if (targetItem !== draggedItem) {
+    } else if (
+      targetItem !== draggedItem &&
+      targetItem.items.name === draggedItem.items.name
+    ) {
+      // targetSlot item = dragged item + canItemsStack -> sum quantity
+      if (canItemsStack(targetItem.items.name)) {
+        const updatedItems = items
+          .map((item) => {
+            if (item === targetItem) {
+              return {
+                ...item,
+                item_quantity: item.item_quantity + draggedItem.item_quantity,
+              };
+            }
+            return item;
+          })
+          .filter((item) => item !== draggedItem);
+
+        setItems(updatedItems);
+      }
+    } else {
+      // diferent item? change places
       const updatedItems = items.map((item) => {
         if (item === targetItem) {
           return { ...item, item_slot: draggedItem.item_slot };
@@ -96,12 +123,44 @@ export default function Backpack() {
         }
         return item;
       });
-
       setItems(updatedItems);
     }
 
     setDraggedItem(null);
   };
+
+  async function updateBackpackOrder() {
+    if (items == initialItems) {
+      alert("You need to make changes before saving.")
+    }
+    if (items != initialItems) {
+      const itemsToUpdate = items.filter((x) => !initialItems.includes(x));
+
+      let itemsId = items.map(function (itm) {
+        return itm.id;
+      });
+      let initialItemsId = initialItems.map(function (itm) {
+        return itm.id;
+      });
+      const itemsToDelete = initialItemsId.filter(
+        (x) => itemsId.indexOf(x) === -1
+      );
+
+      const requestBody = {
+        itemsToUpdate,
+        itemsToDelete,
+      };
+
+      const { data, error } = await supabase.functions.invoke(
+        "updateBackpackOrder",
+        {
+          body: JSON.stringify(requestBody),
+        }
+      );
+      console.log(data);
+      console.log(error);
+    }
+  }
 
   return (
     <div>
@@ -150,12 +209,7 @@ export default function Backpack() {
                         Price={item.items.price}
                       />
                     ) : (
-                      <BackpackItem
-                        ItemName={null}
-                        ItemImage={null}
-                        Quantity={null}
-                        Price={null}
-                      />
+                      <EmptyBackPackSlot />
                     )}
                   </div>
                 );
@@ -170,11 +224,11 @@ export default function Backpack() {
               const item = items.find((item) => item.item_slot === i + 6);
               return (
                 <div
-                  key={i+6}
+                  key={i + 6}
                   draggable={!!item}
                   onDragStart={(e) => item && handleDragStart(e, item)}
                   onDragOver={(e) => handleDragOver(e)}
-                  onDrop={(e) => handleDrop(e, i+6)}
+                  onDrop={(e) => handleDrop(e, i + 6)}
                 >
                   {item ? (
                     <BackpackItem
@@ -184,12 +238,7 @@ export default function Backpack() {
                       Price={item.items.price}
                     />
                   ) : (
-                    <BackpackItem
-                      ItemName={null}
-                      ItemImage={null}
-                      Quantity={null}
-                      Price={null}
-                    />
+                    <EmptyBackPackSlot />
                   )}
                 </div>
               );
@@ -197,7 +246,7 @@ export default function Backpack() {
           </div>
           <button
             className={`mt-10 w-1/3 py-2 px-4 rounded bg-red-800 text-white hover:bg-red-600`}
-            onClick={() => getItemsInfo()}
+            onClick={() => updateBackpackOrder()}
           >
             <span className="text-xl">Save!</span>
           </button>
